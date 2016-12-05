@@ -1,9 +1,9 @@
 var User       = require('../models/user');
+var Trip       = require('../models/trip');
+var Photos       = require('../models/photos');
 var jwt        = require('jsonwebtoken');
 var config     = require('../config');
-var nodemailer = require('nodemailer');
-var uuid = require('node-uuid');
-
+var lwip = require('lwip');
 
 
 // super secret for creating tokens
@@ -14,12 +14,12 @@ module.exports = function(app, express) {
     var apiRouter = express.Router();
 
     // route to generate sample user
-    apiRouter.post('/register', function(req, res) {
+    /*apiRouter.post('/register', function(req, res) {
 
         //check user and don't allow duplicate username, email or phone
         User.findOne({$or: [{ 'username': (req.body.username).toLowerCase()}, {'email': req.body.email}, {'phone': req.body.phone}]}, function(err, user) {
 
-            // if there is no chris user, create one
+            // if there is no user, create one
             if (!user) {
                 var newUser = new User();
 
@@ -28,9 +28,6 @@ module.exports = function(app, express) {
                 newUser.password = req.body.password;
                 newUser.email = (req.body.email).toLowerCase();
                 newUser.phone = req.body.phone;
-                newUser.isCompany = req.body.isCompany;
-                newUser.area = req.body.area;
-                newUser.category = req.body.category;
                 newUser.save(function(err){
                     if (err) {
                         res.status(403).send({
@@ -52,80 +49,86 @@ module.exports = function(app, express) {
 
         });
 
-    });
+    });*/
 
-    apiRouter.get('/forgot', function(req, res) {
-        res.json({ message: 'Implement here the html forgot pass'});
-    });
-
-    apiRouter.post('/reset/:token', function(req, res) {
-        console.log('hit route');
-        User.findOne({ 'resetPasswordToken': req.params.token, 'resetPasswordExpires': { $gt: Date.now() } }, function(err, user) {
-            if (!user) {
-                res.json({ message: 'Password reset token is invalid or has expired.'});
-                //return res.redirect('/forgot');
-            } else {
-                user.password = req.body.password;
-                user.save(function(err){
-                    if (err) {
-                        res.status(403).send({
-                            success: false,
-                            message: 'Failed to reset password!' //+ err
-                        });
-                    } else {
-                        res.json({
-                            message: 'Password successfully updated.'
-                        });
-                    }
-                });
-            }
-
-        });
-    });
-
-    apiRouter.post('/forgot', function(req, res) {
-
-        User.findOne({'email': req.body.email}, function(err, user) {
+    /**
+     * TRIPS ROUTE
+     */
+    apiRouter.get('/trips', function(req, res) {
+        Trip.find({}, function(err, trips) {
             if (err) res.send(err);
-            if (user) {
-
-                //generate password expiration token
-                var token = uuid.v4();
-                //save the token and expiration in the db
-                user.resetPasswordToken = token;
-                user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-
-                user.save(function(err) {
-                    if (err) res.send(err);
-                });
-
-                var smtpConfig = config.smtpConfig;
-
-                // create reusable transporter object using the default SMTP transport
-                var transporter = nodemailer.createTransport(smtpConfig);
-
-                // setup e-mail data with unicode symbols
-                var mailOptions = {
-                    from: '"Webmaster" <info@test.com>', // sender address
-                    to: user.email, // list of receivers
-                    subject: 'Mesteri.com resetare parola.', // Subject line
-                    html: 'Salut ' + user.name + "<br><br> primesti acest email ca urmare a cererii primite de resetare a parolei.<br> Userul tau in portal e : <b>" + user.username + "</b><br> apasa <a href='"+config.baseUrl+"/reset/"+ token +"'>aici</a> pentru a reseta parola."// html body
-                };
-
-                // send mail with defined transport object
-                transporter.sendMail(mailOptions, function(error, info){
-                    if(error){
-                        return console.log(error);
-                    }
-                    res.json({ message: 'Mail sent!'+ info.response });
-                });
-            } else {
-                res.json({ message: 'No user found!'});
-            }
-
+            res.json(trips);
         });
     });
 
+    apiRouter.post('/trips', isLoggedIn, function(req, res) {
+        var newTrip = new Trip();
+        newTrip.tripName = req.body.tripName || 'New Trip';
+        newTrip.tripDate = req.body.tripDate || new Date();
+        newTrip.tripDescription = req.body.tripDescription || 'N/A';
+        newTrip.save(function(err){//consider upsert here
+            if (err) {
+                res.status(403).send({
+                    success: false,
+                    message: 'Failed to save trip!' + err
+                });
+            } else {
+                res.json({
+                    message: 'Trip saved.'
+                });
+            }
+        });
+
+    });
+
+    apiRouter.get('/trip/:trip_id', function(req, res) {
+        Trip.findById(req.params.trip_id, function(err, trip) {
+            if (err) res.send(err);
+            res.json(trip);
+        });
+    });
+
+    apiRouter.get('/photos/:trip_id', function(req, res) {
+        console.log('tripID:' + req.params.trip_id)
+        Photos.find({tripId :req.params.trip_id}, function(err, photos) {
+            if (err) res.send(err);
+            res.json(photos);
+        });
+    });
+
+    apiRouter.post('/upload/:trip_id', isLoggedIn, function(req, res) {
+        var fileBuffer = req.file.buffer;
+        var imgName = req.file.fieldname + '-' + Date.now();
+        if(req.file.originalname.split('.').pop() !== 'jpg'){
+            res.send('incorrect extension!, you should use only jpg files');
+        }
+
+        lwip.open(fileBuffer, 'jpg', function(err, image) {
+            if (err) return console.log(err);
+            var ratio = 200 / image.width();
+            image.scale(ratio, function(err, img){
+                img.writeFile('../client/uploads/' + imgName + '.jpg', function(err) {
+                    if (err) throw err;
+                    var newPhoto = new Photos();
+
+                    newPhoto.tripId = req.params.trip_id || '';
+                    newPhoto.tripPhoto = imgName || '';
+                    newPhoto.save(function(err){
+                        if (err) {
+                            res.status(403).send({
+                                success: false,
+                                message: 'Failed to save photo!' + err
+                            });
+                        } else {
+                            res.json({
+                                message: 'Photo saved.'
+                            });
+                        }
+                    });
+                });
+            });
+        });
+    });
 
 
     // route to authenticate a user (POST http://localhost:8080/api/authenticate)
@@ -184,7 +187,7 @@ module.exports = function(app, express) {
         });
     });
 
-    apiRouter.get('/dashboard', isLoggedIn,  function(req, res){
+    apiRouter.get('/', isLoggedIn,  function(req, res){
         res.json({ message: 'im in !!!??' });
     });
 

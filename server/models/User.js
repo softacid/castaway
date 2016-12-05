@@ -10,13 +10,12 @@ var UserSchema   = new Schema({
     phone: { type: Number, required: true, index: { unique: true }},
     password: { type: String, required: true, select: false },
     isActivated: {type: Boolean, default:false},
-    isCompany: {type: Boolean, default:false},
-    area: {type: String, required: true},
-    category: [],
     resetPasswordToken: String,
     resetPasswordExpires: Date
 
 });
+
+
 
 // hash the password before the user is saved
 UserSchema.pre('save', function(next) {

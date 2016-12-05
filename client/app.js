@@ -1,7 +1,4 @@
-angular.module('home', []);
-angular.module('login', []);
-angular.module('adminHome', []);
-angular.module('authService', []);
+/*global angular*/
 
 angular.module('castawayApp.controllers', []);
 angular.module('castawayApp.services', []);
@@ -16,12 +13,7 @@ angular.module('castawayApp', [
     'castawayApp.filters',
 
     // AngularJS
-    'ngRoute',
-
-    // All modules are being loaded here but EMPTY - they will be filled with controllers and functionality
-    'home',
-    'login',
-    'adminHome'
+    'ngRoute', 'ngFileUpload'
 ]);
 
 // configure our routes
@@ -40,13 +32,6 @@ var app = angular.module('castawayApp').config([
                 templateUrl: 'views/home.html',
                 controller: 'homeCtrl',
                 access: {
-                    auth: false
-                }
-            })
-            .when('/dashboard', {
-                templateUrl: 'views/dashboard.html',
-                controller: 'dashboardCtrl',
-                access: {
                     auth: true
                 }
             })
@@ -57,11 +42,25 @@ var app = angular.module('castawayApp').config([
                     auth: false
                 }
             })
-            .when('/forgot', {
-                templateUrl: 'views/forgot.html',
-                controller: 'loginCtrl',
+            .when('/newTrip', {
+                templateUrl: 'views/newTrip.html',
+                controller: 'tripCtrl',
                 access: {
-                    auth: false
+                    auth: true
+                }
+            })
+            .when('/trips', {
+                templateUrl: 'views/trips.html',
+                controller: 'tripCtrl',
+                access: {
+                    auth: true
+                }
+            })
+            .when('/trip/:trip_id', {
+                templateUrl: 'views/singleTrip.html',
+                controller: 'tripDetailCtrl',
+                access: {
+                    auth: true
                 }
             })
             .otherwise({

@@ -5,12 +5,16 @@ var morgan     = require('morgan'); 		// used to see requests
 var mongoose   = require('mongoose');
 var config 	   = require('./config');
 var path 	   = require('path');
+var multer  = require('multer');
+
 
 // APP CONFIGURATION ==================
 // ====================================
 // use body parser so we can grab information from POST requests
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+app.use(multer({inMemory: true}).single('file'));
 
 // configure our app to handle CORS requests
 app.use(function(req, res, next) {

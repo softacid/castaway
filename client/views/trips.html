@@ -1,10 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+<div class="list-group" ng-repeat="trip in trips">
+    <a href="/trip/{{trip._id}}" class="list-group-item">{{trip.tripName}}</a>
+</div>

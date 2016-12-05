@@ -3,7 +3,7 @@
  */
 var castawayAppConfig = {
     // Application Version
-    mesteriAppVersion: '0.1',
+    castawayAppVersion: '0.1',
     // DEBUGGING INFORMATION
     debug: true,
 

@@ -2,24 +2,26 @@
   "name": "castaway",
   "version": "0.0.1",
   "dependencies": {
-    "bcrypt-nodejs": "latest",
-    "body-parser": "latest",
-    "express": "latest",
+    "bcrypt-nodejs": "*",
+    "body-parser": "*",
+    "express": "*",
     "jsonwebtoken": "^7.0.1",
-    "mongoose": "latest",
-    "morgan": "latest",
-    "nodemailer": "latest",
-    "node-uuid": "latest"
+    "mongoose": "*",
+    "morgan": "*",
+    "nodemailer": "*",
+    "node-uuid": "*",
+    "lwip": "0.0.9",
+    "multer": "1.1.0"
   },
   "devDependencies": {
-    "grunt-contrib-concat": "latest",
-    "grunt": "latest",
-    "grunt-contrib-jshint": "latest",
-    "jshint-stylish": "latest",
-    "grunt-contrib-uglify": "latest",
-    "grunt-contrib-less": "latest",
-    "grunt-contrib-cssmin": "latest",
-    "grunt-contrib-watch": "latest",
-    "grunt-contrib-clean": "latest"
+    "grunt-contrib-concat": "*",
+    "grunt": "*",
+    "grunt-contrib-jshint": "*",
+    "jshint-stylish": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-less": "*",
+    "grunt-contrib-cssmin": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-contrib-clean": "*"
   }
 }

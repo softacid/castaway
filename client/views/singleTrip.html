@@ -1,10 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+<section ng-if="!editTrip" id="singleTrip">
+    <div class="title"><h3>{{trip.tripName}}</h3> <span>({{trip.tripDate | date: 'fullDate'}})</span></div>
+    <div>{{trip.tripDescription}}</div>
+
+    <ul>
+        <li ng-repeat="photo in photos">
+            <img src="../uploads/{{photo.tripPhoto}}.jpg">
+        </li>
+    </ul>
+</section>
+
+<section ng-if="editTrip">
+edit trip
+</section>
+<section>
+
+    <form id="uploadForm"
+          ngf-select=""
+          ngf-drop=""
+          ng-model="files"
+          action    =  {{uploadUrl}}
+          method    =  "post"
+          enctype   =  "multipart/form-data"
+          class="drop-box"
+          ngf-drag-over-class="{ accept:'dragover', reject:'dragover-err', delay:100}"
+          ngf-multiple="true" ngf-allow-dir="false"
+          ngf-accept="'.jpg'">Drag images here or click
+    </form>
+
+</section>

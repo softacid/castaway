@@ -15,7 +15,8 @@ angular.module('castawayApp.controllers').controller('loginCtrl', [
 
                         // if a user successfully logs in, redirect to users page
                         if (data.success)
-                            $location.path('/dashboard');
+                            $location.path('/');
+
                         else
                             $scope.error = data.message;
 

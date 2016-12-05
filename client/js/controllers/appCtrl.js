@@ -1,11 +1,16 @@
 /*global angular*/
 
 angular.module('castawayApp.controllers').controller('appCtrl', [
-    '$scope', '$location', 'Auth',
-    function ($scope, $location, Auth) {
+    '$rootScope', '$scope', '$location', 'Auth',
+    function ($rootScope, $scope, $location, Auth) {
         'use strict';
         $scope._init = function () {
             $scope.isLoggedIn = Auth.isLoggedIn();
+
+            // check to see if a user is logged in on every request
+            $rootScope.$on('$routeChangeStart', function () {
+                $scope.isLoggedIn = Auth.isLoggedIn();
+            });
 
             /**
              * Navigation helper
