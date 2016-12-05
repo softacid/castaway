@@ -1,20 +1,39 @@
 /*global angular*/
 
 angular.module('castawayApp.controllers').controller('tripDetailCtrl', [
-    '$rootScope', '$scope','Auth','tripService','$routeParams', 'Upload',
-    function ($rootScope, $scope, Auth, tripService, $routeParams, Upload) {
+    '$rootScope', '$scope','Auth','tripService','$routeParams', 'Upload', '$location',
+    function ($rootScope, $scope, Auth, tripService, $routeParams, Upload, $location) {
         'use strict';
         $scope._init = function () {
 
             $scope.trip = [];
-            $scope.editTrip = false;
-            var tripId = $routeParams.trip_id || '';
+            $scope.editMode = false;
 
             $scope.busy = true;
             $scope.ready = false;
             $scope.uploadUrl = [];
             $scope.files = [];
             $scope.photos = [];
+
+            var tripId = $routeParams.trip_id || '';
+            getTripById(tripId);
+            getTripPhotosById(tripId);
+
+            $scope.editTrip = function(){
+                $scope.editMode = true;
+            };
+
+            $scope.viewTrip = function(){
+                $scope.editMode = false;
+            };
+
+            $scope.deleteTrip = function(){
+                $scope.editMode = false;
+                tripService.deleteTrip(tripId).then(function(data){
+                    $location.path('/trips');
+                });
+
+            };
 
             // check to see if a user is logged in on every request
             $rootScope.$on('$routeChangeStart', function () {
@@ -25,15 +44,6 @@ angular.module('castawayApp.controllers').controller('tripDetailCtrl', [
                     .then(function (data) {
                         $scope.user = data.data;
                     });
-            });
-
-            tripService.getTripById(tripId).then(function(data){
-               $scope.trip = data;
-               $scope.uploadUrl = "/api/upload/" + $scope.trip._id;
-            });
-
-            tripService.getTripPhotosById(tripId).then(function(data){
-                $scope.photos = data;
             });
 
             $scope.$watch('files', function () {
@@ -53,18 +63,42 @@ angular.module('castawayApp.controllers').controller('tripDetailCtrl', [
                             var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
                             //console.log('progress: ' + progressPercentage + '% ' + evt.config.file.name);
                         }).success(function (data, status, headers, config) {
-                            //console.log('file ' + config.file.name + 'uploaded. Response: ' + data);
+                            getTripPhotosById(tripId);
                         });
                     }
                 }
             };
         };
+
+        var getTripById = function(tripId){
+            tripService.getTripById(tripId).then(function(data){
+                if(data){
+                    $scope.trip = data;
+                    $scope.uploadUrl = "/api/upload/" + $scope.trip._id;
+                } else {
+                    $location.path('/trips');
+                }
+
+            });
+        };
+
+        var getTripPhotosById = function(tripId) {
+            tripService.getTripPhotosById(tripId).then(function (data) {
+                $scope.photos = data;
+            });
+        };
+
+
         // DESTRUCTOR
         $scope.$on('$destroy', function () {
             $scope.trip = [];
-            $scope.editTrip = false;
-            //$scope.files = [];
-            //$scope.uploadUrl = [];
+            $scope.editMode = false;
+
+            $scope.busy = true;
+            $scope.ready = false;
+            $scope.uploadUrl = [];
+            $scope.files = [];
+            $scope.photos = [];
         });
 
         // Run constructor

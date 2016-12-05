@@ -4,6 +4,7 @@ var Photos       = require('../models/photos');
 var jwt        = require('jsonwebtoken');
 var config     = require('../config');
 var lwip = require('lwip');
+var fs = require('fs');
 
 
 // super secret for creating tokens
@@ -86,6 +87,38 @@ module.exports = function(app, express) {
             if (err) res.send(err);
             res.json(trip);
         });
+    });
+
+    apiRouter.delete('/trip/:trip_id', function(req, res) {
+
+        //find and delete photos from disk
+        Photos.find({
+            tripId :req.params.trip_id
+        }, function(err, photos) {
+
+            if (err) res.send(err);
+            for (var photo in photos){
+                fs.unlink('../client/uploads/' + photos[photo].tripPhoto + '.jpg', function(err) {
+                    if (err) throw err;
+                    //console.log('successfully deleted ' + photos[photo].tripPhoto + '.jpg');
+                });
+            }
+        });
+
+        //remove trip and photos from db
+       Trip.remove({
+            _id: req.params.trip_id
+        }, function(err, trip) {
+            if (err) res.send(err);
+
+            Photos.remove({
+                tripId: req.params.trip_id
+            }, function(err, trip) {
+                if (err) res.send(err);
+                res.json({ message: 'Trip successfully deleted' });
+            });
+        });
+
     });
 
     apiRouter.get('/photos/:trip_id', function(req, res) {

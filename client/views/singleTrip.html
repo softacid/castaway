@@ -1,4 +1,10 @@
-<section ng-if="!editTrip" id="singleTrip">
+<section>
+    <a href="/newTrip" type="button" class="btn btn-success">Add trip</a>
+    <button ng-if="!editMode" ng-click="editTrip()" type="button" class="btn btn-primary">Edit trip</button>
+    <button ng-if="editMode" ng-click="viewTrip()" type="button" class="btn btn-primary">View trip</button>
+    <button ng-click="deleteTrip()" type="button" class="btn btn-danger" confirm="Are you sure you want to delete this trip? All the trips details will be deleted, including the pictures!">Delete trip</button>
+</section>
+<section ng-if="!editMode" id="singleTrip">
     <div class="title"><h3>{{trip.tripName}}</h3> <span>({{trip.tripDate | date: 'fullDate'}})</span></div>
     <div>{{trip.tripDescription}}</div>
 
@@ -9,10 +15,10 @@
     </ul>
 </section>
 
-<section ng-if="editTrip">
+<section ng-if="editMode">
 edit trip
 </section>
-<section>
+<section ng-if="!editMode">
 
     <form id="uploadForm"
           ngf-select=""
