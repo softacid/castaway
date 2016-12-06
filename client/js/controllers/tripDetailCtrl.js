@@ -20,7 +20,6 @@ angular.module('castawayApp.controllers').controller('tripDetailCtrl', [
             getTripPhotosById(tripId);
 
             $scope.editTrip = function(tripName, tripDate, tripDescription){
-                debugger;
                 if(!tripName){//we just switch view
                     $scope.editMode = true;
                     $scope.tripDate =  new Date(tripDate);
