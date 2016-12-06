@@ -89,6 +89,23 @@ module.exports = function(app, express) {
         });
     });
 
+    apiRouter.put('/trip/:trip_id', function(req, res) {
+        Trip.findById(req.params.trip_id, function(err, trip) {
+            if (err) res.send(err);
+
+            var values = req.body;
+
+            Trip.update({_id: req.params.trip_id}, values, function(err, values) {
+                if (!err) {
+                    res.json("Trip updated");
+                } else {
+                    res.write("Update failed");
+                }
+            });
+
+        });
+    });
+
     apiRouter.delete('/trip/:trip_id', function(req, res) {
 
         //find and delete photos from disk

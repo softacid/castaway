@@ -19,8 +19,23 @@ angular.module('castawayApp.controllers').controller('tripDetailCtrl', [
             getTripById(tripId);
             getTripPhotosById(tripId);
 
-            $scope.editTrip = function(){
-                $scope.editMode = true;
+            $scope.editTrip = function(tripName, tripDate, tripDescription){
+                debugger;
+                if(!tripName){//we just switch view
+                    $scope.editMode = true;
+                    $scope.tripDate =  new Date(tripDate);
+                } else {
+                    var data = {
+                        tripName:tripName,
+                        tripDate:tripDate,
+                        tripDescription:tripDescription
+                    };
+                    tripService.editTrip(tripId, data).then(function(result){
+                        $scope.editMode = false;
+                        $location.path('/trip/'+ tripId);
+                    });
+                }
+
             };
 
             $scope.viewTrip = function(){

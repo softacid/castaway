@@ -84,7 +84,24 @@ angular.module('castawayApp.services').factory('tripService',[
             return deferred.promise;
         };
 
-
+        service.editTrip = function(tripId, data){
+            var deferred = $q.defer();
+            $http({
+                method: 'PUT',
+                url: URI.getTrip + tripId,
+                data: {
+                    tripName: data.tripName,
+                    tripDate: data.tripDate,
+                    tripDescription: data.tripDescription
+                }
+            }).success(function(response) {
+                deferred.resolve(response);
+            }).error(function(error) {
+                console.log(error);
+                deferred.reject(error);
+            });
+            return deferred.promise;
+        };
 
         return service;
     }]);
