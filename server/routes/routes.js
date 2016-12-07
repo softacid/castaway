@@ -56,8 +56,25 @@ module.exports = function(app, express) {
      * TRIPS ROUTE
      */
     apiRouter.get('/trips', function(req, res) {
+
         Trip.find({}, function(err, trips) {
             if (err) res.send(err);
+
+            trips.forEach(function(trip, key){
+
+               /* Photos.find({tripId :trip._id}, function(err, photos) {
+                    if (err) res.send(err);
+
+                    var r = trip.toObject();
+                    r.tripPhotos = photos.length;
+
+
+                });*/
+                Photos.count({tripId :trip._id}, function(err, c) {
+                    console.log('Count is ' + c);
+                    trips[key].tripPhotos = c;
+                });
+            });
             res.json(trips);
         });
     });
@@ -145,6 +162,28 @@ module.exports = function(app, express) {
             res.json(photos);
         });
     });
+
+    apiRouter.delete('/photo/:photo_id', function(req, res) {
+        //find and delete photo from disk
+        Photos.findById(req.params.photo_id, function(err, photo) {
+            if (err) res.send(err);
+            fs.unlink('../client/uploads/' + photo.tripPhoto + '.jpg', function(err) {
+                if (err) throw err;
+                //remove photo from db
+                Photos.remove({
+                    _id: req.params.photo_id
+                }, function(err, photo) {
+                    if (err) res.send(err);
+                    res.json({ message: 'Photo successfully deleted' });
+                });
+
+            });
+
+        });
+
+
+    });
+
 
     apiRouter.post('/upload/:trip_id', isLoggedIn, function(req, res) {
         var fileBuffer = req.file.buffer;

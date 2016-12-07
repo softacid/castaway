@@ -6,7 +6,8 @@ angular.module('castawayApp.services').factory('tripService',[
         var URI = {
             newTrip: '/api/trips/',
             getTrip: '/api/trip/',
-            getTripPhotos: '/api/photos/'
+            getTripPhotos: '/api/photos/',
+            photo: '/api/photo/'
         };
 
         service.addTrip = function(tripName, tripDate, tripDescription) {
@@ -94,6 +95,20 @@ angular.module('castawayApp.services').factory('tripService',[
                     tripDate: data.tripDate,
                     tripDescription: data.tripDescription
                 }
+            }).success(function(response) {
+                deferred.resolve(response);
+            }).error(function(error) {
+                console.log(error);
+                deferred.reject(error);
+            });
+            return deferred.promise;
+        };
+
+        service.deleteTripPhoto = function(photoId){
+            var deferred = $q.defer();
+            $http({
+                method: 'DELETE',
+                url: URI.photo + photoId
             }).success(function(response) {
                 deferred.resolve(response);
             }).error(function(error) {

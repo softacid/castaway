@@ -1,6 +1,6 @@
 
 module.exports = {
-    'port': process.env.PORT || 3000,
+    'port': process.env.PORT || 3001,
     'database': 'mongodb://localhost:27017/castaway',
     'secret': 'ilovescotchscotchyscotchscotch',
     'baseUrl': 'http://localhost:3000',

@@ -49,6 +49,15 @@ angular.module('castawayApp.controllers').controller('tripDetailCtrl', [
 
             };
 
+            $scope.deleteTripPhoto = function(photo){
+                $scope.editMode = false;
+                tripService.deleteTripPhoto(photo._id).then(function(data){
+                    //$location.path('/trip/' + tripId);
+                    $scope._init();
+                });
+
+            };
+
             // check to see if a user is logged in on every request
             $rootScope.$on('$routeChangeStart', function () {
                 $scope.isLoggedIn = Auth.isLoggedIn();
