@@ -1,6 +1,5 @@
 var User       = require('../models/user');
 var Trip       = require('../models/trip');
-var Photos       = require('../models/photos');
 var jwt        = require('jsonwebtoken');
 var config     = require('../config');
 var lwip = require('lwip');
@@ -70,10 +69,10 @@ module.exports = function(app, express) {
 
 
                 });*/
-                Photos.count({tripId :trip._id}, function(err, c) {
+                /*Photos.count({tripId :trip._id}, function(err, c) {
                     console.log('Count is ' + c);
                     trips[key].tripPhotos = c;
-                });
+                });*/
             });
             res.json(trips);
         });
@@ -124,63 +123,44 @@ module.exports = function(app, express) {
     });
 
     apiRouter.delete('/trip/:trip_id', function(req, res) {
-
-        //find and delete photos from disk
-        Photos.find({
-            tripId :req.params.trip_id
-        }, function(err, photos) {
-
+        Trip.findOne({'_id': req.params.trip_id}, function(err, trip){
             if (err) res.send(err);
-            for (var photo in photos){
-                fs.unlink('../client/uploads/' + photos[photo].tripPhoto + '.jpg', function(err) {
-                    if (err) throw err;
-                    //console.log('successfully deleted ' + photos[photo].tripPhoto + '.jpg');
+            if(trip !== null){
+               trip.tripPhotos.forEach(function (photo, key) {
+                    fs.unlink('../client/uploads/' + photo.name, function (err) {
+                        if (err) throw err;
+                        console.log('successfully deleted ' + photo.name);
+                    });
                 });
             }
-        });
-
-        //remove trip and photos from db
-       Trip.remove({
-            _id: req.params.trip_id
-        }, function(err, trip) {
-            if (err) res.send(err);
-
-            Photos.remove({
-                tripId: req.params.trip_id
+            Trip.remove({
+                _id: req.params.trip_id
             }, function(err, trip) {
                 if (err) res.send(err);
-                res.json({ message: 'Trip successfully deleted' });
+                res.send('Trip deleted!');
             });
         });
-
     });
 
-    apiRouter.get('/photos/:trip_id', function(req, res) {
-        console.log('tripID:' + req.params.trip_id)
-        Photos.find({tripId :req.params.trip_id}, function(err, photos) {
-            if (err) res.send(err);
-            res.json(photos);
-        });
-    });
-
-    apiRouter.delete('/photo/:photo_id', function(req, res) {
-        //find and delete photo from disk
-        Photos.findById(req.params.photo_id, function(err, photo) {
-            if (err) res.send(err);
-            fs.unlink('../client/uploads/' + photo.tripPhoto + '.jpg', function(err) {
-                if (err) throw err;
-                //remove photo from db
-                Photos.remove({
-                    _id: req.params.photo_id
-                }, function(err, photo) {
-                    if (err) res.send(err);
-                    res.json({ message: 'Photo successfully deleted' });
+    apiRouter.delete('/photo/:photo_id/trip/:trip_id', function(req, res) {
+        Trip.findOne({'_id': req.params.trip_id}, function(err, trip){
+                if (err) res.send(err);
+                trip.tripPhotos.forEach(function(photo, key){
+                    if(photo._id == req.params.photo_id){
+                        fs.unlink('../client/uploads/' + photo.name, function(err) {
+                            if (err) throw err;
+                            console.log('successfully deleted ' + photo.name );
+                        });
+                    }
                 });
-
-            });
-
         });
 
+        Trip.findOneAndUpdate({'_id': req.params.trip_id},
+            { $pull: { "tripPhotos" : { '_id': req.params.photo_id} } },
+            function(err){
+                if (err) res.send(err);
+                res.send('photo deleted!');
+            });
 
     });
 
@@ -198,25 +178,28 @@ module.exports = function(app, express) {
             image.scale(ratio, function(err, img){
                 img.writeFile('../client/uploads/' + imgName + '.jpg', function(err) {
                     if (err) throw err;
-                    var newPhoto = new Photos();
+                        Trip.findById(req.params.trip_id, function(err, trip) {
+                            var imageObj = {name: imgName + '.jpg'};
+                            trip.tripPhotos.push(imageObj);
 
-                    newPhoto.tripId = req.params.trip_id || '';
-                    newPhoto.tripPhoto = imgName || '';
-                    newPhoto.save(function(err){
-                        if (err) {
-                            res.status(403).send({
-                                success: false,
-                                message: 'Failed to save photo!' + err
+                            trip.save(function(err){
+                                if (err) {
+                                    res.status(403).send({
+                                        success: false,
+                                        message: 'Failed to save photo!' + err
+                                    });
+                                } else {
+                                    res.json({
+                                        message: 'Photo saved.'
+                                    });
+                                }
                             });
-                        } else {
-                            res.json({
-                                message: 'Photo saved.'
-                            });
-                        }
+                        });
                     });
-                });
             });
         });
+
+
     });
 
 

@@ -13,11 +13,9 @@ angular.module('castawayApp.controllers').controller('tripDetailCtrl', [
             $scope.ready = false;
             $scope.uploadUrl = [];
             $scope.files = [];
-            $scope.photos = [];
 
             var tripId = $routeParams.trip_id || '';
             getTripById(tripId);
-            getTripPhotosById(tripId);
 
             $scope.editTrip = function(tripName, tripDate, tripDescription){
                 if(!tripName){//we just switch view
@@ -46,14 +44,13 @@ angular.module('castawayApp.controllers').controller('tripDetailCtrl', [
                 tripService.deleteTrip(tripId).then(function(data){
                     $location.path('/trips');
                 });
-
             };
 
-            $scope.deleteTripPhoto = function(photo){
+            $scope.deleteTripPhoto = function(photo, trip){
                 $scope.editMode = false;
-                tripService.deleteTripPhoto(photo._id).then(function(data){
-                    //$location.path('/trip/' + tripId);
-                    $scope._init();
+                tripService.deleteTripPhoto(photo._id, trip._id).then(function(data){
+                    getTripById(trip._id);
+
                 });
 
             };
@@ -86,7 +83,7 @@ angular.module('castawayApp.controllers').controller('tripDetailCtrl', [
                             var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
                             //console.log('progress: ' + progressPercentage + '% ' + evt.config.file.name);
                         }).success(function (data, status, headers, config) {
-                            getTripPhotosById(tripId);
+                            $scope._init();
                         });
                     }
                 }
@@ -105,12 +102,6 @@ angular.module('castawayApp.controllers').controller('tripDetailCtrl', [
             });
         };
 
-        var getTripPhotosById = function(tripId) {
-            tripService.getTripPhotosById(tripId).then(function (data) {
-                $scope.photos = data;
-            });
-        };
-
 
         // DESTRUCTOR
         $scope.$on('$destroy', function () {
@@ -121,7 +112,6 @@ angular.module('castawayApp.controllers').controller('tripDetailCtrl', [
             $scope.ready = false;
             $scope.uploadUrl = [];
             $scope.files = [];
-            $scope.photos = [];
         });
 
         // Run constructor

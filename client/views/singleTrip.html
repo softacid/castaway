@@ -9,9 +9,9 @@
     <div>{{trip.tripDescription}}</div>
 
     <ul>
-        <li ng-repeat="photo in photos">
-            <img src="../uploads/{{photo.tripPhoto}}.jpg">
-            <button ng-click="deleteTripPhoto(photo)" type="button" class="btn btn-danger" confirm="Are you sure you want to delete this picture? ">Delete Photo</button>
+        <li ng-repeat="photo in trip.tripPhotos">
+            <img src="../uploads/{{photo.name}}">
+            <button ng-click="deleteTripPhoto(photo, trip)" type="button" class="btn btn-danger" confirm="Are you sure you want to delete this picture? ">Delete Photo</button>
         </li>
     </ul>
 </section>
