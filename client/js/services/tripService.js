@@ -56,19 +56,6 @@ angular.module('castawayApp.services').factory('tripService',[
             return deferred.promise;
         };
 
-        service.getTripPhotosById = function(tripId){
-            var deferred = $q.defer();
-            $http({
-                method: 'GET',
-                url: URI.getTrip + tripId
-            }).success(function(response) {
-                deferred.resolve(response);
-            }).error(function(error) {
-                console.log(error);
-                deferred.reject(error);
-            });
-            return deferred.promise;
-        };
 
         service.deleteTrip = function(tripId){
             var deferred = $q.defer();

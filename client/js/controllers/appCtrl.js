@@ -16,8 +16,8 @@ angular.module('castawayApp.controllers').controller('appCtrl', [
              * Navigation helper
              * @param {String} page
              */
-            $scope.goTo = function (page) {
-                $location.path(page);
+            $scope.goTo = function (id) {
+                $location.path('/trip/' + id);
             };
 
             $scope.doLogout = function() {

@@ -1,5 +1,20 @@
+<section id="trips">
 <a href="/newTrip" type="button" class="btn btn-success">Add trip</a>
 <br><br>
-<div class="list-group" ng-repeat="trip in trips">
-    <a href="/trip/{{trip._id}}" class="list-group-item">{{trip.tripName}}</a>
-</div>
+    <table class="table table-hover table-responsive">
+        <thead>
+        <tr>
+            <th>Trip Name</th>
+            <th>Trip Date</th>
+            <th>Pictures</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="list-group" ng-repeat="trip in trips" ng-click="goTo(trip._id)">
+                <td class="tripName">{{trip.tripName}}</td>
+                <td class="tripDate">{{trip.tripDate | date: shortDate}}</td>
+                <td class="tripPhotosCount">{{trip.tripPhotos.length}} photos</td>
+            </a>
+            </tr>
+        </table>
+</section>

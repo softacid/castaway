@@ -2,3 +2,5 @@ node_module/
 bower_components/
 client/shared/
 .idea/
+/node_modules/
+/client/libs/
