@@ -13,7 +13,7 @@ angular.module('castawayApp', [
     'castawayApp.filters',
 
     // AngularJS
-    'ngRoute', 'ngFileUpload', 'ngWig'
+    'ngRoute', 'ngFileUpload', 'ngWig', 'ngSanitize'
 ]);
 
 // configure our routes
